@@ -11,6 +11,7 @@
 #include "line_sensor_i2c.h"
 #include "line_follow_ctrl.h"
 #include "motor_drv.h"
+#include "route_grid.h"
 
 /* 以下函数建议使用CubeMX生成，并加入Keil工程 */
 void SystemClock_Config(void);
@@ -25,6 +26,21 @@ int main(void)
 {
     LineSensorData_t sensor_data;
     LineFollowCtrl_t follow;
+    RouteGridCtrl_t route_ctrl;
+
+    /*
+     * 路线示例（可改）：
+     * 1) 先走2格，左转
+     * 2) 再走1格，右转
+     * 3) 再走3格，掉头
+     * 4) 最后走1格，结束
+     */
+    static const RouteStep_t route_table[] = {
+        {2, TURN_LEFT},
+        {1, TURN_RIGHT},
+        {3, TURN_BACK},
+        {1, TURN_STRAIGHT}
+    };
 
     HAL_Init();
     SystemClock_Config();
@@ -35,6 +51,7 @@ int main(void)
 
     MotorDrv_Init();
     LineFollow_Init(&follow);
+    RouteGrid_Init(&route_ctrl, &follow, route_table, (uint16_t)(sizeof(route_table) / sizeof(route_table[0])));
 
     /* 模块上电稳定 */
     HAL_Delay(3000);
@@ -43,7 +60,7 @@ int main(void)
     {
         if (LineSensor_Read(&sensor_data) == HAL_OK)
         {
-            LineFollow_Update(&follow, &sensor_data);
+            RouteGrid_Update(&route_ctrl, &sensor_data);
         }
         else
         {
