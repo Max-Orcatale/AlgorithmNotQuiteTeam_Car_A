@@ -1,0 +1,15 @@
+# Keil / MDK user & build artifacts
+**/Debug/
+**/OBJ/
+**/*.axf
+**/*.elf
+**/*.bin
+**/*.hex
+**/*.map
+**/*.lst
+**/*.list
+**/*.o
+**/*.d
+**/*.su
+**/*.uvguix.*
+**/*.uvoptx
